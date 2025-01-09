@@ -165,10 +165,7 @@ local PhantomHub = {
     settings = SETTINGS,
     colors = COLORS,
     icons = ICONS
-}
-
-return PhantomHub
--- Enhanced UI System & Animations
+}-- Enhanced UI System & Animations
 local UI = {}
 UI.__index = UI
 
@@ -460,7 +457,6 @@ function UI.createToggle(properties)
     return toggle, function() return enabled end
 end
 
-return UI
 -- Home Tab Implementation
 local HomeTab = {}
 HomeTab.__index = HomeTab
@@ -1088,7 +1084,6 @@ function HomeTab:destroy()
     end
 end
 
-return HomeTab
 -- Player Tab Implementation
 local PlayerTab = {}
 PlayerTab.__index = PlayerTab
@@ -1675,7 +1670,6 @@ function PlayerTab:destroy()
     workspace.CurrentCamera.FieldOfView = DEFAULT_SETTINGS.fieldOfView
 end
 
-return PlayerTab
 -- Scripts Tab Implementation
 local ScriptsTab = {}
 ScriptsTab.__index = ScriptsTab
@@ -2190,7 +2184,6 @@ function ScriptsTab:destroy()
     self:saveFavorites()
 end
 
-return ScriptsTab
 -- Settings Tab Implementation
 local SettingsTab = {}
 SettingsTab.__index = SettingsTab
@@ -2837,7 +2830,6 @@ function SettingsTab:destroy()
     end
 end
 
-return SettingsTab
 -- Debug Tab Implementation
 local DebugTab = {}
 DebugTab.__index = DebugTab
@@ -3472,7 +3464,6 @@ function DebugTab:destroy()
     end
 end
 
-return DebugTab
 -- Combat Tab Implementation
 local CombatTab = {}
 CombatTab.__index = CombatTab
@@ -3921,8 +3912,6 @@ function CombatTab:getTarget()
             end
         end
         
-        return nearest
-        
     elseif self.aimbotMode == "FOV" then
         local inFOV = {}
         
@@ -3959,8 +3948,6 @@ function CombatTab:getTarget()
                 minHealth = health
             end
         end
-        
-        return lowestHealth
         
     elseif self.aimbotMode == "Random" then
         return players[math.random(1, #players)]
@@ -4050,7 +4037,6 @@ function CombatTab:destroy()
     self:updateHitboxes()
 end
 
-return CombatTab
 -- Visuals Tab Implementation
 local VisualsTab = {}
 VisualsTab.__index = VisualsTab
@@ -4622,7 +4608,6 @@ function VisualsTab:destroy()
     self:restoreWorldSettings()
 end
 
-return VisualsTab
 -- Misc Tab Implementation
 local MiscTab = {}
 MiscTab.__index = MiscTab
@@ -4912,7 +4897,7 @@ function MiscTab:createServerSection()
     
     serverHopBtn.MouseButton1Click:Connect(function()
         self:serverHop()
-    })
+    end)
     
     -- Rejoin button
     local rejoinBtn = UI.create("TextButton", {
@@ -4926,7 +4911,7 @@ function MiscTab:createServerSection()
     
     rejoinBtn.MouseButton1Click:Connect(function()
         self:rejoinServer()
-    })
+    end)
     
     -- Server info
     local info = {
@@ -5187,7 +5172,6 @@ function MiscTab:destroy()
     self:toggleGodMode(false)
 end
 
-return MiscTab
 -- Config Tab Implementation
 local ConfigTab = {}
 ConfigTab.__index = ConfigTab
@@ -5743,7 +5727,6 @@ function ConfigTab:destroy()
     self:saveSettings()
 end
 
-return ConfigTab
 -- Script Tab Implementation
 local ScriptTab = {}
 ScriptTab.__index = ScriptTab
@@ -6325,14 +6308,29 @@ function ScriptTab:searchScripts(query)
     for _, entry in ipairs(self.scriptList:GetChildren()) do
         if entry:IsA("Frame") then
             local scriptName = entry.TextLabel.Text:lower()
-            entry.Visible = scriptName:find(query, 1, true)
+            -- Handle nil query case and empty query should show all scripts
+            if query == "" then
+                entry.Visible = true
+            else
+                entry.Visible = scriptName:find(query, 1, true) ~= nil
+            end
         end
     end
 end
 
 function ScriptTab:destroy()
-    -- Save favorites
+    -- Save favorites and clean up
     self:saveFavorites()
+    
+    -- Clean up any connections or references
+    if self.editor then
+        self.editor:Destroy()
+        self.editor = nil
+    end
+    
+    if self.scriptList then
+        self.scriptList:Destroy() 
+        self.scriptList = nil
+    end
 end
-
-return ScriptTab
+end
